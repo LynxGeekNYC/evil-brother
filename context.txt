@@ -1,0 +1,18 @@
+[default]
+exten => s,1,Answer()
+
+; Check if the caller ID is available
+exten => s,n,Set(CALLERID=${CALLERID(num)})
+
+; If caller ID is available, proceed with the callback
+exten => s,n,GotoIf($[${LEN(${CALLERID})} > 0]?callback:hangup)
+
+; If caller ID is not available, hang up the call
+exten => s,n(hangup),Hangup()
+
+; Callback context
+exten => callback,1,Playback(your-custom-message) ; You can replace this with your own custom announcement
+exten => callback,n,Dial(SIP/${CALLERID}@your-provider) ; Replace "your-provider" with your SIP provider's configuration
+exten => callback,n,Wait(2)
+exten => callback,n,ConfBridge(1) ; Conference bridge number 1, you can adjust as needed
+
